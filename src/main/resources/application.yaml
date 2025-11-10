@@ -9,8 +9,8 @@ spring:
     username: root
     password: hongchu
   redis:
-    host: 172.27.103.99
-    port: 6380
+    host: ${hmdp.redis.host}
+    port: ${hmdp.redis.port}
     lettuce:
       pool:
         max-active: 10

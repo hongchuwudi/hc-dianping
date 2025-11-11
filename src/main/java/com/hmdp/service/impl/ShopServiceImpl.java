@@ -7,11 +7,15 @@ import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmdp.utils.RedisConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.CACHE_SHOP_KEY;
 
@@ -50,9 +54,27 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         if(shopping == null) return Result.fail("商品不存在");
 
         // 6.存在先缓存到redis
-        srt.opsForValue().set("cache:shop:" + id, JSONUtil.toJsonStr(shopping));
+        srt.opsForValue().set("cache:shop:" + id, JSONUtil.toJsonStr(shopping), RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
 
         // 7. 返回
         return Result.ok(shopping);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result update(Shop shop) {
+        // 检查该id商品是否存在
+        Long id = shop.getId();
+        if(id == null) return Result.fail("店铺id不能为空");
+
+        // 缓存策略: 旁路缓存 Cache-Aside pattern
+        // 1. 写入数据库
+        updateById(shop);
+
+        // 2. 删除缓存
+        srt.delete(CACHE_SHOP_KEY + id);
+
+        // 3. 返回成功
+        return Result.ok();
     }
 }

@@ -1,13 +1,20 @@
 server:
   port: 8081
+
 spring:
+  # 环境选择
+  profiles:
+    active: dev
+  # 应用信息
   application:
     name: hmdp
+  # 数据源配置
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/hmdp?useSSL=false&serverTimezone=UTC
     username: root
     password: hongchu
+  # Redis配置
   redis:
     host: ${hmdp.redis.host}
     port: ${hmdp.redis.port}
@@ -17,8 +24,11 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+  # json配置
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
+
+# MyBatis-Plus配置
 mybatis-plus:
   type-aliases-package: com.hmdp.entity # 别名扫描包
 logging:

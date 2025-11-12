@@ -16,23 +16,23 @@ public class MVCConfig implements WebMvcConfigurer {
     @Resource
     private RefreshTokenInterceptor refreshTokenInterceptor;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        // 登录拦截器
-        registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/user/code",
-                        "/user/login",
-                        "/blog/hot",
-                        "/shop/**",
-                        "/shop-type/**",
-                        "/upload/**",
-                        "/voucher/**"
-                ).order(2);
-        // 刷新token拦截器
-        registry.addInterceptor(refreshTokenInterceptor).addPathPatterns("/**").order(1);
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        // 登录拦截器
+//        registry.addInterceptor(loginInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(
+//                        "/user/code",
+//                        "/user/login",
+//                        "/blog/hot",
+//                        "/shop/**",
+//                        "/shop-type/**",
+//                        "/upload/**",
+//                        "/voucher/**"
+//                ).order(2);
+//        // 刷新token拦截器
+//        registry.addInterceptor(refreshTokenInterceptor).addPathPatterns("/**").order(1);
+//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

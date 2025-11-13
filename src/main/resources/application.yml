@@ -18,6 +18,7 @@ spring:
   redis:
     host: ${hmdp.redis.host}
     port: ${hmdp.redis.port}
+    password: ${hmdp.redis.password}
     lettuce:
       pool:
         max-active: 10

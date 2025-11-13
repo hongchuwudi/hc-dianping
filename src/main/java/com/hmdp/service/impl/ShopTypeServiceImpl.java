@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> implements IShopTypeService {
     @Resource
     private StringRedisTemplate srt;
+
     @Override
     public Result queryTypeList() {
         // 0.redis key
@@ -39,21 +40,23 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
 
         // 2.判断是否存在
         if (typeListJson != null && !typeListJson.isEmpty()) {
-            // 3.如果存在则直接返回,否则继续下一步
+            // 3.如果存在则直接返回
             // 3.1 将JSON字符串转换为ShopType对象列表
             List<ShopType> typeList = typeListJson.stream()
                     .map(json -> JSONUtil.toBean(json, ShopType.class))
                     .collect(Collectors.toList());
             log.info("查询类型缓存成功");
-            // 3.2 返回
-           return Result.ok(typeListJson);
+            // 3.2 返回解析后的对象列表，而不是JSON字符串列表
+            return Result.ok(typeList);  // 这里改成 typeList
         }
 
         // 4.不存在则查询数据库
         List<ShopType> typeLists = query().orderByAsc("sort").list();
 
         // 5.不存在则返回错误
-        if (typeLists == null) return Result.fail("查询类型列表失败");
+        if (typeLists == null || typeLists.isEmpty()) {
+            return Result.fail("查询类型列表失败");
+        }
 
         // 6. 将数据存入缓存中
         List<String> jsonList = typeLists.stream()
@@ -61,7 +64,7 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
                 .collect(Collectors.toList());
         srt.opsForList().rightPushAll(key, jsonList);
 
-        // 返回结果
+        // 7. 返回结果
         return Result.ok(typeLists);
     }
 }
